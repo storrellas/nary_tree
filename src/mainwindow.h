@@ -26,6 +26,7 @@ public:
 
 class TreeNode{
 public:
+
     TreeNode* parent;
     Employee node;
     QList<TreeNode> successors;
