@@ -34,28 +34,24 @@ void MainWindow::consoleWrite(const QString &line){
 void MainWindow::initialize(){
     loggerMacroDebug("Log from Initialize")
 
+}
 
+void MainWindow::on_generateTablesBtn_clicked()
+{
     QSqlQuery query;
 
-    loggerMacroDebug("Excuting query")
-    // Store paramters in DB
-    //bool res = query.exec("INSERT INTO [employee_stats] ([id],[employee_id], [n_sup], [n_t_sup], [depth], [level]) VALUES (1,1, 1, 1, 1, 1);");
+    loggerMacroDebug("Generating tables")
 
-    bool res = query.exec("INSERT INTO employee_stats VALUES (3,1,1,1,1,1);");
-
-
-    loggerMacroDebug("query was " + QString::number(res) )
-    loggerMacroDebug("query was " + query.executedQuery() )
-
-
-        loggerMacroDebug("query was " + query.lastError().driverText() )
-    return;
-
-/*
     // Generate employee table
-    QString sqlStr  = QString("CREATE TABLE employees ( ") +
+    QString sqlStr  = QString("DROP table IF EXISTS employee;");
+    query.exec(sqlStr);
+    sqlStr  = QString("DROP table  IF EXISTS employee_stats;");
+    query.exec(sqlStr);
+
+    // Generate employee table
+    sqlStr  = QString("CREATE TABLE employee ( ") +
                       QString("    id         INTEGER        PRIMARY KEY AUTOINCREMENT,") +
-                      QString("    supervisor INT            REFERENCES employees ( id ),") +
+                      QString("    supervisor INT            REFERENCES employee ( id ),") +
                       QString("    name       VARCHAR( 20 ) ") +
                       QString(");");
     query.exec(sqlStr);
@@ -72,55 +68,25 @@ void MainWindow::initialize(){
     // Generate employee_stats table
     sqlStr  = QString("CREATE TABLE employee_stats ( ") +
               QString("    id          INTEGER PRIMARY KEY AUTOINCREMENT,") +
-              QString("    employee_id INTEGER REFERENCES employees ( id ),") +
+              QString("    employee_id INTEGER REFERENCES employee ( id ),") +
               QString("    n_sup       INTEGER,") +
               QString("    n_t_sup     INTEGER,") +
-              QString("    depth       INTEGER ") +
+              QString("    depth       INTEGER,") +
+              QString("    level       INTEGER ") +
               QString(");");
     query.exec(sqlStr);
-/**/
+    loggerMacroDebug("DONE!")
+    return;
+}
+
+void MainWindow::on_performAnalysisBtn_clicked()
+{
 
     // Load database results
     // -----------------------------
-/*
-    query.exec("Select * from employee;");
-    while (query.next()) {
-        int id = query.value(0).toInt();
-        int supervisor = query.value(1).toInt();
-        QString name = query.value(2).toString();
-        loggerMacroDebug("id: " + QString::number(id) + " supervisor: " + QString::number(supervisor) + " name: " + name)
-    }
-/**/
 
     // Load Hierarchy from DB
     this->loadHierarchy();
-
-
-    /*
-    // Get number of supervisors
-    loggerMacroDebug(" -- Get number of supervisors --")
-    TreeNode treeNode = rootNode.successors[1];
-    level = 0;
-    this->getLevel(&treeNode);
-    loggerMacroDebug("Number of supervisors for " + treeNode.get().toString() + " -> " + QString::number(level))
-
-
-    // Get total number of subordinates
-    loggerMacroDebug("-- Get total number of subordinates --")
-    treeNode = rootNode.successors[0];
-    ntsup = 0;
-    this->getNTSUP(&treeNode);
-    loggerMacroDebug("Total number of subordinates for " + treeNode.get().toString() + " -> " + QString::number(ntsup))
-
-
-    // Get depth
-    loggerMacroDebug("-- Get depth --")
-    treeNode = rootNode.successors[0];
-    depth = this->getDepth(&treeNode);
-    loggerMacroDebug("Depth " + treeNode.get().toString() + " -> " + QString::number(depth))
-/**/
-    // Calculate paramters
-    //this->calculateParameters(&(rootNode.successors[1]));
 
 
     // Calculate parameters
@@ -130,6 +96,11 @@ void MainWindow::initialize(){
     }
 
 
+    // Commit results to DB
+    loggerMacroDebug("-- Commiting results to DB --")
+    foreach(TreeNode* treeNode, treeNode_list){
+        this->commitResults(treeNode);
+    }
 
 }
 
@@ -263,6 +234,25 @@ void MainWindow::calculateParameters(TreeNode *treeNode){
     loggerMacroDebug( treeNode->get().toString() ) ;
 
 }
+
+void MainWindow::commitResults(TreeNode* treeNode){
+
+    QSqlQuery query;
+    QString sqlStr  = QString("INSERT INTO [employee_stats] ([employee_id], [n_sup], [n_t_sup], [depth], [level])") +
+                      QString("VALUES(") +
+                      QString::number(treeNode->node.id) + "," +
+                      QString::number(treeNode->node.nsup) + "," +
+                      QString::number(treeNode->node.ntsup) + "," +
+                      QString::number(treeNode->node.depth) + "," +
+                      QString::number(treeNode->node.level) +
+                      QString(");");
+
+
+    query.exec(sqlStr);
+
+}
+
+
 
 
 
