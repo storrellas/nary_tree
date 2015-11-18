@@ -91,6 +91,9 @@ void MainWindow::initialize(){
 
 void MainWindow::loadHierarchy(){
 
+
+    QList<Employee> employee_list;
+
     TreeNode rootNode;
     loggerMacroDebug("-- Looking for rootNode -- ")
     QSqlQuery query;
@@ -113,7 +116,7 @@ void MainWindow::loadHierarchy(){
 
     // Load Children for the employee_list
     loggerMacroDebug("-- Loading Tree -- ")
-    loadChildren(rootNode);
+    loadChildren(rootNode, employee_list);
 
 
     // Get number of supervisors
@@ -141,7 +144,7 @@ void MainWindow::loadHierarchy(){
 }
 
 
-void MainWindow::loadChildren(TreeNode& treeNode){
+void MainWindow::loadChildren(TreeNode& treeNode, QList<Employee> employee_list){
     //loggerMacroDebug("-- Entering for " + treeNode.get().name + " -- ")
 
 
@@ -149,12 +152,12 @@ void MainWindow::loadChildren(TreeNode& treeNode){
 
         //loggerMacroDebug("Evaluating " + employee.name)
         if( employee.supervisor == ((Employee) treeNode.get()).id){
-            QString parentStr = "Parent:" + treeNode.get().toString();
-            QString childStr = "Child:" + employee.toString();
+            //QString parentStr = "Parent:" + treeNode.get().toString();
+            //QString childStr = "Child:" + employee.toString();
             //loggerMacroDebug(parentStr + "<>" + childStr)
 
             TreeNode childNode(employee, &treeNode);
-            loadChildren(childNode);
+            loadChildren(childNode, employee_list);
             treeNode.addChild(childNode);
 
         }
@@ -176,7 +179,7 @@ int MainWindow::getLevel(TreeNode* treeNode){
 }
 
 int MainWindow::getNSUP(TreeNode* treeNode){
-    return treeNode->successors.count();
+    return treeNode->successors.size();
 }
 
 int MainWindow::getNTSUP(TreeNode* treeNode){

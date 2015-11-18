@@ -26,10 +26,9 @@ public:
 
 class TreeNode{
 public:
-
     TreeNode* parent;
     Employee node;
-    QList<TreeNode> successors;
+    vector<TreeNode> successors;
 
     TreeNode(){ parent = NULL; }
     TreeNode (Employee _node, TreeNode* _parent)
@@ -44,11 +43,11 @@ public:
         return node;
     }
 
-    QList<TreeNode> succ() {
+    vector<TreeNode> succ() {
         return successors;
     }
-    void addChild(TreeNode t) {
-        successors.append(t);
+    void addChild(TreeNode treeNode) {
+        successors.push_back(treeNode);
     }
 
 
@@ -66,7 +65,30 @@ class MainWindow : public QMainWindow
 
 public:
 
-    QList<Employee> employee_list;
+    // ----------------------
+    // ATTRIBUTES
+    // ----------------------
+
+    /*!
+     * \brief level holds the level calculation
+     */
+    int level;
+
+    /*!
+     * \brief ntsup holds the total number of subordinates
+     */
+    int ntsup;
+
+    /*!
+     * \brief depth holds the depth
+     */
+    int depth;
+
+    // ----------------------
+    // FUNCTIONS
+    // ----------------------
+
+
 
     /*!
      * \brief MainWindow Public constructor/Destructor
@@ -94,18 +116,40 @@ public:
 
 
 
+    /*!
+     * \brief loadChildren generates the tree structure
+     * \param treeNode
+     */
+    void loadChildren(TreeNode& treeNode, QList<Employee> employee_list);
 
-    void loadChildren(TreeNode& treeNode);
 
+    /*!
+     * \brief getLevel gets the level for the specified TreeNode
+     * \param treeNode
+     * \return
+     */
     int getLevel(TreeNode* treeNode);
+
+    /*!
+     * \brief getNSUP Number of known immediate subordinates.
+     * \param treeNode
+     * \return
+     */
     int getNSUP(TreeNode* treeNode);
+
+    /*!
+     * \brief getNTSUP gets number of total subordinates
+     * \param treeNode
+     * \return
+     */
     int getNTSUP(TreeNode* treeNode);
+
+    /*!
+     * \brief getDepth gets the number of subordinates for employees
+     * \param treeNode
+     * \return
+     */
     int getDepth(TreeNode* treeNode);
-
-    int level;
-    int ntsup;
-    int depth;
-
 
 private:
 
