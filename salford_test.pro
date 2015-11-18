@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += sql core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,9 +12,21 @@ TARGET = salford_test
 TEMPLATE = app
 
 
+INCLUDEPATH += ./src
+
+# Output directories
+OBJECTS_DIR    = obj
+UI_HEADERS_DIR = obj
+UI_SOURCES_DIR = obj
+DESTDIR        = $${_PRO_FILE_PWD_}/output
+
+# SOURCES
 SOURCES += src/main.cpp\
            src/mainwindow.cpp
+# HEADERS
+HEADERS  += src/mainwindow.h \
+            src/commonparameters.h \
+            src/connection.h \
 
-HEADERS  += src/mainwindow.h
 
 FORMS    += src/mainwindow.ui
