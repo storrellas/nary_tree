@@ -13,6 +13,9 @@ using namespace  std;
 
 class Employee{
 public:
+
+    // Attributes
+
     /*!
      * \brief id id of the employee
      */
@@ -47,6 +50,13 @@ public:
      * \brief depth Number of levels of known subordinates below employee.
      */
     int depth;
+
+    // Methods
+
+    /*!
+     * \brief Employee public constructor
+     */
+    Employee() : id(0), name(""), supervisor(0), level(0), nsup(0), ntsup(0), depth(0){}
 
     /*!
      * \brief toString returns a string containing the information of the class
@@ -234,6 +244,7 @@ signals:
 private slots:
     void on_generateTablesBtn_clicked();
     void on_performAnalysisBtn_clicked();
+
 };
 
 #endif // MAINWINDOW_H

@@ -46,6 +46,8 @@
 #include <QSqlError>
 #include <QSqlQuery>
 
+#include "src/commonparameters.h"
+
 /*
     This file defines a helper function to open a connection to an
     in-memory SQLITE database and to create a test table.
@@ -54,12 +56,12 @@
     below. All the examples in this directory use this function to
     connect to a database.
 */
-//! [0]
-static bool createConnection()
+static bool createConnection(QString filename)
 {
+    loggerMacroDebug("Loading data from file ->" + filename)
+
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    //db.setDatabaseName(":memory:");
-    db.setDatabaseName("salford_db.sqlite3");
+    db.setDatabaseName(filename);
     if (!db.open()) {
         QMessageBox::critical(0, qApp->tr("Cannot open database"),
             qApp->tr("Unable to establish a database connection.\n"
@@ -72,6 +74,5 @@ static bool createConnection()
 
     return true;
 }
-//! [0]
 
 #endif

@@ -56,7 +56,8 @@ int main(int argc, char *argv[])
 
 
     // Create SQLite connection
-    if (!createConnection())
+    QString filename = "salford_db.sqlite3";
+    if (!createConnection( filename ))
         return 1;
 
     mainWindow.initialize();

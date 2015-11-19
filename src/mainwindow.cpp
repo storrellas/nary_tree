@@ -40,7 +40,7 @@ void MainWindow::on_generateTablesBtn_clicked()
 {
     QSqlQuery query;
 
-    loggerMacroDebug("Generating tables")
+    loggerMacroDebug("-- Generating tables -- ")
 
     // Generate employee table
     QString sqlStr  = QString("DROP table IF EXISTS employee;");
@@ -49,13 +49,16 @@ void MainWindow::on_generateTablesBtn_clicked()
     query.exec(sqlStr);
 
     // Generate employee table
+    loggerMacroDebug("Generate table employee ...")
     sqlStr  = QString("CREATE TABLE employee ( ") +
                       QString("    id         INTEGER        PRIMARY KEY AUTOINCREMENT,") +
                       QString("    supervisor INT            REFERENCES employee ( id ),") +
                       QString("    name       VARCHAR( 20 ) ") +
                       QString(");");
     query.exec(sqlStr);
+    loggerMacroDebug("DONE!")
 
+    loggerMacroDebug("Generating dummy data employee ...")
     query.exec("INSERT INTO [employee] ([id], [supervisor], [name]) VALUES (1, null, 'Sergi');");
     query.exec("INSERT INTO [employee] ([id], [supervisor], [name]) VALUES (2, 1, 'Albert');");
     query.exec("INSERT INTO [employee] ([id], [supervisor], [name]) VALUES (3, 2, 'Joan');");
@@ -63,9 +66,11 @@ void MainWindow::on_generateTablesBtn_clicked()
     query.exec("INSERT INTO [employee] ([id], [supervisor], [name]) VALUES (5, 3, 'Josep');");
     query.exec("INSERT INTO [employee] ([id], [supervisor], [name]) VALUES (6, 4, 'Maria');");
     query.exec("INSERT INTO [employee] ([id], [supervisor], [name]) VALUES (7, 4, 'Anna');");
-
+    query.exec("INSERT INTO [employee] ([id], [supervisor], [name]) VALUES (8, 3, 'Marc');");
+    loggerMacroDebug("DONE!")
 
     // Generate employee_stats table
+    loggerMacroDebug("Generate table employee_stats ...")
     sqlStr  = QString("CREATE TABLE employee_stats ( ") +
               QString("    id          INTEGER PRIMARY KEY AUTOINCREMENT,") +
               QString("    employee_id INTEGER REFERENCES employee ( id ),") +
@@ -82,6 +87,8 @@ void MainWindow::on_generateTablesBtn_clicked()
 void MainWindow::on_performAnalysisBtn_clicked()
 {
 
+    loggerMacroDebug("-- Performing analysis -- ")
+
     // Load database results
     // -----------------------------
 
@@ -90,17 +97,18 @@ void MainWindow::on_performAnalysisBtn_clicked()
 
 
     // Calculate parameters
-    loggerMacroDebug("-- Calculate parameters --")
+    loggerMacroDebug("Calculate parameters ...")
     for(int i = 0; i < treeNode_list.size(); i++){
         this->calculateParameters(treeNode_list[i]);
     }
-
+    loggerMacroDebug("DONE!")
 
     // Commit results to DB
-    loggerMacroDebug("-- Commiting results to DB --")
+    loggerMacroDebug("Commiting results to DB ...")
     foreach(TreeNode* treeNode, treeNode_list){
         this->commitResults(treeNode);
     }
+    loggerMacroDebug("DONE!")
 
 }
 
@@ -110,11 +118,12 @@ void MainWindow::on_performAnalysisBtn_clicked()
 
 void MainWindow::loadHierarchy(){
 
+    loggerMacroDebug("Importing data from DB ... ")
+
 
     QList<Employee> employee_list;
 
     TreeNode* rootNode = new TreeNode();
-    loggerMacroDebug("-- Looking for rootNode -- ")
     QSqlQuery query;
     query.exec("Select * from employee;");
     while (query.next()) {
@@ -122,21 +131,23 @@ void MainWindow::loadHierarchy(){
         Employee employee;
         employee.id = query.value(0).toInt();
         employee.supervisor = query.value(1).toInt();
-        employee.name = query.value(2).toString();
-        loggerMacroDebug("id: " + QString::number(employee.id) + " supervisor:" + QString::number(employee.supervisor) + ":name: " + employee.name)
+        employee.name = query.value(2).toString();        
         employee_list.append(employee);
+
+        loggerMacroDebug( employee.toString() )
 
         if(employee.supervisor == 0 ){
             rootNode->set(employee);
             treeNode_list.append( rootNode );
-
+            loggerMacroDebug("Root node!")
         }
     }
 
 
     // Load Children for the employee_list
-    loggerMacroDebug("-- Loading Tree -- ")
+    loggerMacroDebug("Generating tree with imported data ...")
     loadChildren(*rootNode, employee_list);
+    loggerMacroDebug("DONE!")
 
 }
 
@@ -186,6 +197,7 @@ int MainWindow::getNTSUP(TreeNode* treeNode){
         ntsup++;
         getNTSUP(&childNode);
     }
+    return ntsup;
 }
 
 int MainWindow::getDepth(TreeNode* treeNode){
@@ -251,9 +263,3 @@ void MainWindow::commitResults(TreeNode* treeNode){
     query.exec(sqlStr);
 
 }
-
-
-
-
-
-
